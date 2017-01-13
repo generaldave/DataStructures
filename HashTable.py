@@ -29,6 +29,7 @@ class Node(object):
         self.value = value
         self.left  = None
         self.right = None
+        self.level = None
 
     def setValue(self, value: int) -> None:
         self.value = value
@@ -59,6 +60,31 @@ class BinaryTree(object):
 
     def getRoot(self) -> Node:
         return self.root
+
+    def breadthFirstSearch(self):
+        self.root.level = 0
+        queue = [self.root]
+        out = []
+        current_level = self.root.level 
+
+        while len(queue) > 0:
+            current_node = queue.pop(0)
+
+            if current_node.level > current_level:
+                current_level += 1 
+
+            out.append(str(current_node)) 
+
+            if current_node.left:
+                current_node.left.level = current_level + 1
+                queue.append(current_node.left) 
+
+            if current_node.right:
+                current_node.right.level = current_level + 1
+                queue.append(current_node.right)                
+
+        return out
+        print (", ".join(out))
 
     def getTree(self, node: Node) -> treeHint:
         if node:
@@ -139,6 +165,15 @@ class HashTable(object):
         if cell:
             return cell.search(cell.getRoot(), string)
 
+    def display(self):
+        out = []
+        for cell in self.table:
+            if cell:
+                temp = cell.breadthFirstSearch()
+                for element in temp:
+                    out.append(element)
+        return out
+
 
 ########################################################################
 #                                                                      #
@@ -166,8 +201,9 @@ for i in range(ASCII_LENGTH):
     cell = hashTable.getTable()[i]
     if cell:
         print (cell.getTree(cell.getRoot()))
-    else:
-        print ("no tree")
+
+print ()
+print(hashTable.display())
 
 node = hashTable.search('Hola')
 print ()

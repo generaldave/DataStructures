@@ -1,214 +1,214 @@
-########################################################################
-#                                                                      #
-# David Fuller                                                         #
-#                                                                      #
-# Hash Table: Using a Binary Search Tree for collisions                #
-#                                                                      #
-# Created on 2017-1-9                                                  #
-#                                                                      #
-########################################################################
+################################################################################
+#                                                                              #
+# David Fuller                                                                 #
+#                                                                              #
+# Hash Table: Using a Binary Search Tree for collisions                        #
+#                                                                              #
+#    1. Node Class: Stores key and information of a node                       #
+#    2. Binary Tree Class: A self-balancing binary search tree                 #
+#    3. Hashtable Class: A hashtable that uses a binary tree for collisions    #
+#                                                                              #
+# Created on 2017-3-23                                                         #
+#                                                                              #
+################################################################################
 
-########################################################################
-#                                                                      #
-#                              CONSTANTS                               #
-#                                                                      #
-########################################################################
+################################################################################
+#                                                                              #
+#                                  CONSTANTS                                   #
+#                                                                              #
+################################################################################
 
 SMALL_PRIME  = 31    # Any small prime
 ASCII_LENGTH = 127   # ASCII set - 1
 
-########################################################################
-#                                                                      #
-#                             NODE CLASS                               #
-#                                                                      #
-########################################################################
+################################################################################
+#                                                                              #
+#                                 NODE CLASS                                   #
+#                                                                              #
+################################################################################
 
 class Node(object):
-    def __init__(self, key: str, value: int) -> None:
+
+    ############################################################################
+    #                                                                          #
+    #                               CONSTRUCTOR                                #
+    #                                                                          #
+    ############################################################################
+    
+    def __init__(self, key : str, kwargs : dict) -> None:
         self.key   = key
-        self.value = value
+        self.info  = kwargs
         self.left  = None
         self.right = None
-        self.level = None
 
-    def setValue(self, value: int) -> None:
-        self.value = value
+    ############################################################################
+    #                                                                          #
+    #                                 METHODS                                  #
+    #                                                                          #
+    ############################################################################
 
-    def getKey(self) -> str:
-        return self.key
+    # Method converts node to string. Output is key, any given values,
+    # and whether there is a left and/or right child
+    def __str__(self) -> None:
+        message = "key: " + self.key
+        for i in self.info:
+            message = message + "\n" + str(i) + ": " + str(self.info[i])
+        if self.left and self.right:
+            message = message + "\nLeft and Right"
+        elif self.left:
+            message = message + "\nLeft"
+        elif self.right:
+            message = message + "\nRight"
+        else:
+            message = message + "\nNo child"
+        return message
 
-    def getValue(self) -> int:
-        return self.value
-
-    def getNode(self) -> (str, int):
-        return self.key, self.value
-
-    def __str__(self) -> str:
-        return self.key + ": " + str(self.value)
-
-########################################################################
-#                                                                      #
-#                          BINARY TREE CLASS                           #
-#                                                                      #
-########################################################################
+################################################################################
+#                                                                              #
+#                               BINARY TREE CLASS                              #
+#                                                                              #
+################################################################################
 
 class BinaryTree(object):
-    treeHint = 'binary tree'
-    
+
+    ############################################################################
+    #                                                                          #
+    #                               CONSTRUCTOR                                #
+    #                                                                          #
+    ############################################################################
+        
     def __init__(self) -> None:
         self.root = None
 
-    def getRoot(self) -> Node:
-        return self.root
+    ############################################################################
+    #                                                                          #
+    #                                 METHODS                                  #
+    #                                                                          #
+    ############################################################################
 
-    def breadthFirstSearch(self):
-        self.root.level = 0
-        queue = [self.root]
-        out = []
-        current_level = self.root.level 
-
-        while len(queue) > 0:
-            current_node = queue.pop(0)
-
-            if current_node.level > current_level:
-                current_level += 1 
-
-            out.append(str(current_node)) 
-
-            if current_node.left:
-                current_node.left.level = current_level + 1
-                queue.append(current_node.left) 
-
-            if current_node.right:
-                current_node.right.level = current_level + 1
-                queue.append(current_node.right)                
-
-        return out
-        print (", ".join(out))
-
-    def getTree(self, node: Node) -> treeHint:
-        if node:
-            return str(node), \
-            self.getTree(node.left), \
-            self.getTree(node.right)
-
-    def insert(self, string: str, value: int) -> None:
+    # Method inserts a node
+    def insert(self, key : str, kwargs : dict) -> None:        
         if self.root == None:
-            self.root = Node(string, value)
-        else:
+            self.root = Node(key, kwargs)
+        else:            
             current = self.root
             while True:
-                if string < current.getKey():
+                if key < current.key:
                     if current.left:
                         current = current.left
                     else:
-                        current.left = Node(string, value)
+                        current.left = Node(key, kwargs)
                         break
-                elif string > current.getKey():
+                elif key > current.key:
                     if current.right:
                         current = current.right
                     else:
-                        current.right = Node(string, value)
+                        current.right = Node(key, kwargs)
                         break
 
-    def search(self, node: Node, key: str) -> Node:
+    # Method searches tree and returns appropriate node
+    def search(self, node : Node, searchKey: str) -> Node:        
         if not node:
             return node
 
-        nodeKey = node.getKey()
-        if nodeKey == key:
+        nodeKey = node.key
+        if searchKey == nodeKey:
             return node
+        if searchKey > nodeKey:
+            return self.search(node.right, searchKey)
+        if searchKey < nodeKey:
+            return self.search(node.left, searchKey)
 
-        if nodeKey < key:
-            return self.search(node.right, key)
+    # Method shows tree
+    def show(self, index : str, node : Node) -> None:
+        if node:
+            if not node.left:
+                print ("index: " + index)
+                print (node, '\n')
+            if node.left:
+                self.show(index, node.left)
+            if node.right:
+                self.show(index, node.right)
 
-        if nodeKey > key:
-            return self.search(node.left, key)
+################################################################################
+#                                                                              #
+#                                HASHTABLE CLASS                               #
+#                                                                              #
+################################################################################
 
-########################################################################
-#                                                                      #
-#                           HASH TABLE CLASS                           #
-#                                                                      #
-########################################################################
+class Hashtable(object):
 
-class HashTable(object):
-    tableHint = 'hash table'
-    
+    ############################################################################
+    #                                                                          #
+    #                               CONSTRUCTOR                                #
+    #                                                                          #
+    ############################################################################
+        
     def __init__(self) -> None:
         self.table = [None] * ASCII_LENGTH
 
-    def getTable(self) -> tableHint:
-        return self.table        
+    ############################################################################
+    #                                                                          #
+    #                                 METHODS                                  #
+    #                                                                          #
+    ############################################################################
 
-    def calcKey(self, string: str) -> str:
+    # Method calculates hash key
+    def calcKey(self, string : str) -> int:
         key = 0
         for char in string:
             key = (SMALL_PRIME * key + ord(char)) % ASCII_LENGTH
         return key
 
-    def insert(self, key: str, value: int) -> None:
+    # Method insert item into hashtable
+    def insert(self, key : str, kwargs : dict) -> None:        
         index = self.calcKey(key)
-        cell  = self.table[index]
+        cell = self.table[index]
+        
         if cell:   # Tree exists            
-            node = cell.search(cell.getRoot(), key)
-            if not node:
-                cell.insert(key, value)
-            else:
-                node.setValue(value)
+            node = cell.search(cell.root, key)
+            if not node:                
+                cell.insert(key, kwargs)
+            else:                
+                node.info = kwargs
         else:
             self.table[index] = BinaryTree()
-            self.table[index].insert(key, value)
+            self.table[index].insert(key, kwargs)
 
-    def search(self, string: str) -> Node:
-        index = self.calcKey(string)
-        cell  = self.table[index]
+    # Method searches hashtable for node based on given information
+    def search(self, key : str) -> Node:
+        index = self.calcKey(key)
+        cell = self.table[index]
         if cell:
-            return cell.search(cell.getRoot(), string)
+            return cell.search(cell.root, key)
 
-    def display(self):
-        out = []
-        for cell in self.table:
-            if cell:
-                temp = cell.breadthFirstSearch()
-                for element in temp:
-                    out.append(element)
-        return out
+    # Method shows hashtable
+    def show(self):
+        for i in range(len(self.table)):
+            if self.table[i] != None:
+                self.table[i].show(str(i), self.table[i].root)
 
+################################################################################
+#                                                                              #
+#                                     DEBUG                                    #
+#                                                                              #
+################################################################################
 
-########################################################################
-#                                                                      #
-#                         DEBUGGING / TESTING                          #
-#                                                                      #
-########################################################################
+if __name__ == "__main__":
+    table = Hashtable()
 
-string    = 'Hello World!'
-hashTable = HashTable()
+    kwargs = {'value': 0}
 
-for char in string:
-    hashTable.insert(char, 0)
+    string = "Hello World!"
+    for char in string:        
+        table.insert(char, kwargs)
 
-hashTable.insert("hi", 1)
-hashTable.insert("ih", 1)
-hashTable.insert("hello", 1)
-hashTable.insert("world", 1)
-hashTable.insert("Hola", 1)
-hashTable.insert("Hola", 1)
-hashTable.insert("two", 0)
-hashTable.insert("two", 5)
+    table.insert("hi", kwargs)
+    table.insert("ih", kwargs)
+    table.insert("hello", kwargs)
+    table.insert("world", kwargs)
+    table.insert("Hola", kwargs)
+    table.insert("two", kwargs)
 
-    
-for i in range(ASCII_LENGTH):
-    cell = hashTable.getTable()[i]
-    if cell:
-        print (cell.getTree(cell.getRoot()))
+    table.show()
 
-print ()
-print(hashTable.display())
-
-node = hashTable.search('Hola')
-print ()
-print (node)
-
-node = hashTable.search('Hello')
-print ()
-print (node)

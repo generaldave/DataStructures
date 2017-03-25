@@ -79,6 +79,7 @@ class BinaryTree(object):
         
     def __init__(self) -> None:
         self.root = None
+        self.nodes = []
 
     ############################################################################
     #                                                                          #
@@ -86,25 +87,29 @@ class BinaryTree(object):
     #                                                                          #
     ############################################################################
 
+    # Method recursively builds tree
+    # Assumes self.nodes to be in order
+    def build(self, start : int, end : int) -> None:        
+        if start > end:
+            return None
+        
+        mid = int(start + (end - start) / 2)
+        node = self.nodes[mid]
+
+        node.left = self.build(start, mid - 1)
+        node.right = self.build(mid + 1, end)
+
+        return node        
+        
     # Method inserts a node
-    def insert(self, key : str, kwargs : dict) -> None:        
-        if self.root == None:
-            self.root = Node(key, kwargs)
-        else:            
-            current = self.root
-            while True:
-                if key < current.key:
-                    if current.left:
-                        current = current.left
-                    else:
-                        current.left = Node(key, kwargs)
-                        break
-                elif key > current.key:
-                    if current.right:
-                        current = current.right
-                    else:
-                        current.right = Node(key, kwargs)
-                        break
+    def insert(self, key : str, kwargs : dict) -> None:
+        node = Node(key, kwargs)
+        if not node in self.nodes:
+            self.nodes.append(node)
+            self.nodes = sorted(self.nodes, key=lambda x: (x.key))
+        start = 0
+        end = len(self.nodes) - 1
+        self.root = self.build(start, end)            
 
     # Method searches tree and returns appropriate node
     def search(self, node : Node, searchKey: str) -> Node:        
@@ -127,6 +132,8 @@ class BinaryTree(object):
                 print (node, '\n')
             if node.left:
                 self.show(index, node.left)
+                print ("index: " + index)
+                print (node, '\n')
             if node.right:
                 self.show(index, node.right)
 
@@ -212,3 +219,12 @@ if __name__ == "__main__":
 
     table.show()
 
+##    tree = BinaryTree()
+##    tree.insert("4", kwargs)
+##    tree.insert("7", kwargs)
+##    tree.insert("2", kwargs)
+##    tree.insert("5", kwargs)
+##    tree.insert("1", kwargs)
+##    tree.insert("6", kwargs)
+##    tree.insert("3", kwargs)
+##    tree.show("0", tree.root)

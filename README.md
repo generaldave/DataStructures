@@ -1,6 +1,6 @@
 HashTable.py:
 
-Written in Python 3.4.3
+Written in Python 3.5.2
 
 This is a hash table class using an ASCII lengthed array (128 elements).
 
